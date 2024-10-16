@@ -22,6 +22,8 @@ builder.Services.AddDbContext<AppIdentityDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {

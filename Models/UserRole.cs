@@ -1,4 +1,4 @@
-﻿namespace SampleDotNet.Models.Entities
+﻿namespace SampleDotNet.Models
 {
     public class UserRole
     {

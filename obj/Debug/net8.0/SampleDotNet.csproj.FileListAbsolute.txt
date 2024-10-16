@@ -146,3 +146,4 @@ D:\IR\SampleDotNet\bin\Debug\net8.0\Microsoft.AspNetCore.Cryptography.KeyDerivat
 D:\IR\SampleDotNet\bin\Debug\net8.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 D:\IR\SampleDotNet\bin\Debug\net8.0\Microsoft.Extensions.Identity.Core.dll
 D:\IR\SampleDotNet\bin\Debug\net8.0\Microsoft.Extensions.Identity.Stores.dll
+D:\IR\SampleDotNet\obj\Debug\net8.0\SampleDotNet.sourcelink.json

@@ -25,7 +25,7 @@
     "Parameters": [
       {
         "Name": "role",
-        "Type": "SampleDotNet.Models.Entities.UserRole",
+        "Type": "SampleDotNet.Models.UserRole",
         "IsRequired": true
       }
     ],
@@ -41,7 +41,7 @@
     "Parameters": [
       {
         "Name": "loginDto",
-        "Type": "SampleDotNet.Models.Entities.Login",
+        "Type": "SampleDotNet.Models.Login",
         "IsRequired": true
       }
     ],
@@ -57,7 +57,23 @@
     "Parameters": [
       {
         "Name": "register",
-        "Type": "SampleDotNet.Models.Entities.Register",
+        "Type": "SampleDotNet.Models.Register",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SampleDotNet.Controllers.AuthController",
+    "Method": "SilentLogin",
+    "RelativePath": "api/Auth/silent-login",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "refreshTokenRequest",
+        "Type": "SampleDotNet.Models.RefreshTokenRequest",
         "IsRequired": true
       }
     ],

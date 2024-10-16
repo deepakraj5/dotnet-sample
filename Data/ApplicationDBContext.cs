@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SampleDotNet.Models.Entities;
 
 namespace SampleDotNet.Data
@@ -12,5 +10,13 @@ namespace SampleDotNet.Data
         }
 
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<RefreshToken>().HasKey(e => e.Jti);
+        }
     }
 }

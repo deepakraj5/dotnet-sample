@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using SampleDotNet.Models.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using SampleDotNet.Services;
+using SampleDotNet.Models;
 
 namespace SampleDotNet.Controllers
 {
@@ -15,13 +16,19 @@ namespace SampleDotNet.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly JwtService _jwtService;
+        private readonly IRefreshTokenService _refreshTokenService;
         private readonly IConfiguration _configuration;
 
-        public AuthController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        public AuthController(UserManager<IdentityUser> userManager, 
+            RoleManager<IdentityRole> roleManager, IConfiguration configuration,
+            JwtService jwtService, IRefreshTokenService refreshTokenService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _jwtService = jwtService;
+            _refreshTokenService = refreshTokenService;
         }
 
         [HttpPost("signup")]
@@ -81,28 +88,46 @@ namespace SampleDotNet.Controllers
             var user = await _userManager.FindByNameAsync(loginDto.Username);
             if(user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password))
             {
-                var userRoles = await _userManager.GetRolesAsync(user);
+                var accessToken = await _jwtService.CreateAccessToken(user);
+                var refreshToken = _jwtService.CreateRefreshToken(user);
 
-                var authClaims = new List<Claim>
-                {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.UserName!),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                };
-
-                authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
-
-                var token = new JwtSecurityToken(
-                    issuer: _configuration["Jwt:Issuer"],
-                    expires: DateTime.Now.AddMinutes(double.Parse(_configuration["Jwt:ExpiryMinutes"]!)),
-                    claims: authClaims,
-                    signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)),
-                                                                    SecurityAlgorithms.HmacSha256)
-                );
-
-                return Ok(new { token = new JwtSecurityTokenHandler().WriteToken(token) });
+                return Ok(new { accessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
+                                refreshToken = new JwtSecurityTokenHandler().WriteToken(refreshToken)});
             }
 
             return Unauthorized();
+        }
+
+        [HttpPost("silent-login")]
+        public async Task<IActionResult> SilentLogin([FromBody] RefreshTokenRequest refreshTokenRequest)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(refreshTokenRequest.Token);
+            var payload = token.Claims;
+
+            //handler.ValidateToken(refreshTokenRequest.Token, )
+
+            var jti = "";
+            var userName = "";
+
+            var user = await _userManager.FindByNameAsync(userName);
+
+            if(!_refreshTokenService.IsValidToken(jti) || user is null)
+            {
+                return Unauthorized("Invalid access token or refresh token");
+            }
+
+            var accessToken = await _jwtService.CreateAccessToken(user);
+            var refreshToken = _jwtService.CreateRefreshToken(user);
+
+            // remove old refresh token from presistance
+            _refreshTokenService.RemoveRefreshToken(jti);
+
+            return Ok(new
+            {
+                accessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
+                refreshToken = new JwtSecurityTokenHandler().WriteToken(refreshToken)
+            });
         }
     }
 }

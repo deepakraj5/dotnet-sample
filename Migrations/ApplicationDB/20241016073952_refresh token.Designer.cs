@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SampleDotNet.Data;
 
@@ -11,9 +12,11 @@ using SampleDotNet.Data;
 namespace SampleDotNet.Migrations.ApplicationDB
 {
     [DbContext(typeof(ApplicationDBContext))]
-    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
+    [Migration("20241016073952_refresh token")]
+    partial class refreshtoken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,6 +56,7 @@ namespace SampleDotNet.Migrations.ApplicationDB
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Jti")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.ToTable("RefreshTokens");
