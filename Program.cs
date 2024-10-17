@@ -65,6 +65,7 @@ builder.Services.AddAuthorization(options =>
         policy.RequireRole("User");
         policy.Requirements.Add(new ValidateAccessToken());
     });
+    options.DefaultPolicy = options.GetPolicy("CustomPolicy")!;
 });
 
 var app = builder.Build();

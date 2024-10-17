@@ -16,24 +16,28 @@ namespace SampleDotNet.Services
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ValidateAccessToken requirement)
         {
-            var jtiClaim = context.User.Claims.Single(claim => claim.Type == "jti");
+            try {
+                var jtiClaim = context.User.Claims.Single(claim => claim.Type == "jti");
 
-            if (jtiClaim == null)
-            {
-                context.Fail();
+                if (jtiClaim == null)
+                {
+                    context.Fail();
+                    return Task.CompletedTask;
+                }
+
+                var userToken = _dbContext.UserAccTokens.SingleOrDefault(token => token.Token == jtiClaim.Value.ToString());
+                // implement to check IsBlackListed
+                if (userToken is null)
+                {
+                    context.Fail();
+                    return Task.CompletedTask;
+                }
+                
+                context.Succeed(requirement);
+                return Task.CompletedTask;
+            } catch{
                 return Task.CompletedTask;
             }
-
-            var userToken = _dbContext.UserAccTokens.SingleOrDefault(token => token.Token == jtiClaim.Value.ToString());
-            // implement to check IsBlackListed
-            if (userToken is null)
-            {
-                context.Fail();
-                return Task.CompletedTask;
-            }
-
-            context.Succeed(requirement);
-            return Task.CompletedTask;
         }
     }
 }
