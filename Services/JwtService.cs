@@ -23,14 +23,15 @@ namespace SampleDotNet.Services
             _refreshTokenService = refreshTokenService;
         }
 
-        public async Task<JwtSecurityToken> CreateAccessToken(IdentityUser user)
+        public async Task<GenerateAccessTokenResponse> CreateAccessToken(IdentityUser user)
         {
             var userRoles = await _userManager.GetRolesAsync(user);
+            string jti = Guid.NewGuid().ToString();
 
             var authClaims = new List<Claim>
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, user.UserName!),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    new Claim(JwtRegisteredClaimNames.Jti, jti)
                 };
 
             authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
@@ -43,7 +44,11 @@ namespace SampleDotNet.Services
                                                                 SecurityAlgorithms.HmacSha256)
             );
 
-            return token;
+            return new GenerateAccessTokenResponse
+            {
+                Token = token,
+                Jti = jti
+            };
         }
 
         public JwtSecurityToken CreateRefreshToken(IdentityUser user)

@@ -9,10 +9,10 @@ using SampleDotNet.Data;
 
 #nullable disable
 
-namespace SampleDotNet.Migrations
+namespace SampleDotNet.Migrations.AppIdentityDb
 {
     [DbContext(typeof(AppIdentityDbContext))]
-    [Migration("20241015040413_auth init")]
+    [Migration("20241017100605_auth init")]
     partial class authinit
     {
         /// <inheritdoc />

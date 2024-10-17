@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace SampleDotNet.Migrations
+namespace SampleDotNet.Migrations.AppIdentityDb
 {
     /// <inheritdoc />
     public partial class authinit : Migration

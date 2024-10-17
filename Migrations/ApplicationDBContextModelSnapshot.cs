@@ -3,20 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SampleDotNet.Data;
 
 #nullable disable
 
-namespace SampleDotNet.Migrations.ApplicationDB
+namespace SampleDotNet.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20241015040439_app init")]
-    partial class appinit
+    partial class ApplicationDBContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,6 +45,35 @@ namespace SampleDotNet.Migrations.ApplicationDB
                     b.HasKey("Id");
 
                     b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("SampleDotNet.Models.Entities.RefreshToken", b =>
+                {
+                    b.Property<string>("Jti")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("ExpiresIn")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Jti");
+
+                    b.ToTable("RefreshTokens");
+                });
+
+            modelBuilder.Entity("SampleDotNet.Models.Entities.UserAccToken", b =>
+                {
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsBlackListed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Token");
+
+                    b.ToTable("UserAccTokens");
                 });
 #pragma warning restore 612, 618
         }

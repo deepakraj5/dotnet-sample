@@ -21,7 +21,7 @@ namespace SampleDotNet.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "User")]
+        [Authorize(Policy = "CustomPolicy")]
         public IActionResult GetAllEmployees()
         {
             var allEmployees = _employeeService.GetEmployees();
@@ -39,7 +39,7 @@ namespace SampleDotNet.Controllers
 
         [HttpGet]
         [Route("{id:guid}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Policy = "CustomPolicy")]
         public IActionResult GetEmployeeById(Guid id)
         {
             var employee = _employeeService.GetEmployeeById(id);

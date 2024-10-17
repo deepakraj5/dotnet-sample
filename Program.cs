@@ -5,6 +5,7 @@ using SampleDotNet.Data;
 using SampleDotNet.Services;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<IAuthorizationHandler, CustomAuthorizationHandler>();
+
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -24,7 +27,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
-builder.Services.AddScoped<IBlackListTokenService, BlackListTokenService>();
+builder.Services.AddScoped<IUserTokenService, UserTokenService>();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
@@ -57,6 +60,11 @@ builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
     options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
+    options.AddPolicy("CustomPolicy", policy =>
+    {
+        policy.RequireRole("User");
+        policy.Requirements.Add(new ValidateAccessToken());
+    });
 });
 
 var app = builder.Build();

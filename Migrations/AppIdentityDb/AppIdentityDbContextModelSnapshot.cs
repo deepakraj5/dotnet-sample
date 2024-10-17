@@ -8,7 +8,7 @@ using SampleDotNet.Data;
 
 #nullable disable
 
-namespace SampleDotNet.Migrations
+namespace SampleDotNet.Migrations.AppIdentityDb
 {
     [DbContext(typeof(AppIdentityDbContext))]
     partial class AppIdentityDbContextModelSnapshot : ModelSnapshot

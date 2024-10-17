@@ -9,11 +9,11 @@ using SampleDotNet.Data;
 
 #nullable disable
 
-namespace SampleDotNet.Migrations.ApplicationDB
+namespace SampleDotNet.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20241016074600_refresh token 1")]
-    partial class refreshtoken1
+    [Migration("20241017100555_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,13 +52,31 @@ namespace SampleDotNet.Migrations.ApplicationDB
 
             modelBuilder.Entity("SampleDotNet.Models.Entities.RefreshToken", b =>
                 {
+                    b.Property<string>("Jti")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("ExpiresIn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Jti")
-                        .HasColumnType("nvarchar(max)");
+                    b.HasKey("Jti");
 
                     b.ToTable("RefreshTokens");
+                });
+
+            modelBuilder.Entity("SampleDotNet.Models.Entities.UserAccToken", b =>
+                {
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsBlackListed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Token");
+
+                    b.ToTable("UserAccTokens");
                 });
 #pragma warning restore 612, 618
         }

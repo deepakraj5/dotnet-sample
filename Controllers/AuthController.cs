@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using SampleDotNet.Services;
 using SampleDotNet.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SampleDotNet.Controllers
 {
@@ -18,17 +19,20 @@ namespace SampleDotNet.Controllers
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly JwtService _jwtService;
         private readonly IRefreshTokenService _refreshTokenService;
+        private readonly IUserTokenService _userTokenService;
         private readonly IConfiguration _configuration;
 
         public AuthController(UserManager<IdentityUser> userManager, 
             RoleManager<IdentityRole> roleManager, IConfiguration configuration,
-            JwtService jwtService, IRefreshTokenService refreshTokenService)
+            JwtService jwtService, IRefreshTokenService refreshTokenService,
+            IUserTokenService userTokenService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _jwtService = jwtService;
             _refreshTokenService = refreshTokenService;
+            _userTokenService = userTokenService;
         }
 
         [HttpPost("signup")]
@@ -77,6 +81,7 @@ namespace SampleDotNet.Controllers
             var result = await _userManager.AddToRoleAsync(user, role.Role);
             if(result.Succeeded)
             {
+                _userTokenService.RemoveAllTokenByUser(user.Id);
                 return Ok(new { message = "Role assigned successfully" });
             }
             return BadRequest(result.Errors);
@@ -91,7 +96,9 @@ namespace SampleDotNet.Controllers
                 var accessToken = await _jwtService.CreateAccessToken(user);
                 var refreshToken = _jwtService.CreateRefreshToken(user);
 
-                return Ok(new { accessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
+                _userTokenService.AddToken(accessToken.Jti, user.Id);
+
+                return Ok(new { accessToken = new JwtSecurityTokenHandler().WriteToken(accessToken.Token),
                                 refreshToken = new JwtSecurityTokenHandler().WriteToken(refreshToken)});
             }
 
@@ -141,9 +148,11 @@ namespace SampleDotNet.Controllers
             // remove old refresh token from persistence
             _refreshTokenService.RemoveRefreshToken(jti);
 
+            _userTokenService.AddToken(accessToken.Jti, user.Id);
+
             return Ok(new
             {
-                accessToken = new JwtSecurityTokenHandler().WriteToken(accessToken),
+                accessToken = new JwtSecurityTokenHandler().WriteToken(accessToken.Token),
                 refreshToken = new JwtSecurityTokenHandler().WriteToken(refreshToken)
             });
         }
