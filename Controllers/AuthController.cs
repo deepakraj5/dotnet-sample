@@ -101,14 +101,32 @@ namespace SampleDotNet.Controllers
         [HttpPost("silent-login")]
         public async Task<IActionResult> SilentLogin([FromBody] RefreshTokenRequest refreshTokenRequest)
         {
+
+            if(refreshTokenRequest.Token is null)
+            {
+                return Unauthorized();
+            }
+
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(refreshTokenRequest.Token);
-            var payload = token.Claims;
 
-            //handler.ValidateToken(refreshTokenRequest.Token, )
+            var tokenValidationParams = new TokenValidationParameters()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = _configuration["Jwt:Issuer"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!)),
 
-            var jti = "";
-            var userName = "";
+                // only when expiry time less than 5 min, allow to use seconds
+                ClockSkew = TimeSpan.Zero
+            };
+
+            handler.ValidateToken(refreshTokenRequest.Token, tokenValidationParams, out var validatedToken);
+
+            var jti = token.Claims.SingleOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)!.Value;
+            var userName = token.Claims.SingleOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)!.Value;
 
             var user = await _userManager.FindByNameAsync(userName);
 
@@ -120,7 +138,7 @@ namespace SampleDotNet.Controllers
             var accessToken = await _jwtService.CreateAccessToken(user);
             var refreshToken = _jwtService.CreateRefreshToken(user);
 
-            // remove old refresh token from presistance
+            // remove old refresh token from persistence
             _refreshTokenService.RemoveRefreshToken(jti);
 
             return Ok(new

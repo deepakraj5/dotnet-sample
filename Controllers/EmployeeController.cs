@@ -10,6 +10,7 @@ namespace SampleDotNet.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class EmployeeController : ControllerBase
     {
         public readonly IEmployeeService _employeeService;
@@ -20,6 +21,7 @@ namespace SampleDotNet.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "User")]
         public IActionResult GetAllEmployees()
         {
             var allEmployees = _employeeService.GetEmployees();
@@ -37,6 +39,7 @@ namespace SampleDotNet.Controllers
 
         [HttpGet]
         [Route("{id:guid}")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetEmployeeById(Guid id)
         {
             var employee = _employeeService.GetEmployeeById(id);

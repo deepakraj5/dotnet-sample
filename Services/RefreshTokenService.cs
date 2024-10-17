@@ -40,12 +40,15 @@ namespace SampleDotNet.Services
         public bool IsValidToken(string Jti)
         {
             var refreshToken = _dbContext.RefreshTokens.Find(Jti);
+
             if (refreshToken is null)
             {
                 throw new KeyNotFoundException("Given Jti not found");
             }
 
-            if(refreshToken.ExpiresIn > DateTime.Now)
+            int expirationResult = DateTime.Compare(refreshToken.ExpiresIn, DateTime.Now);
+
+            if(expirationResult < 0)
             {
                 return false;
             }
