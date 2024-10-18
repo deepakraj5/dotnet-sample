@@ -20,7 +20,7 @@ namespace SampleDotNet.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public IActionResult GetAllEmployees()
         {
             var allEmployees = _employeeService.GetEmployees();

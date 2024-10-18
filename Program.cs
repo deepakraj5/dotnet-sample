@@ -16,18 +16,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IAuthorizationHandler, CustomAuthorizationHandler>();
-
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+options.UseNpgsql(builder.Configuration.GetConnectionString("PSQLConnection")));
 
 builder.Services.AddDbContext<AppIdentityDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+options.UseNpgsql(builder.Configuration.GetConnectionString("PSQLConnection")));
+
+//builder.Services.AddDbContext<AppIdentityDbContext>(options =>
+//options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IUserTokenService, UserTokenService>();
+builder.Services.AddScoped<IAuthorizationHandler, CustomAuthorizationHandler>();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
@@ -62,10 +64,12 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
     options.AddPolicy("CustomPolicy", policy =>
     {
-        policy.RequireRole("User");
         policy.Requirements.Add(new ValidateAccessToken());
     });
-    options.DefaultPolicy = options.GetPolicy("CustomPolicy")!;
+
+    options.DefaultPolicy = new AuthorizationPolicyBuilder()
+        .AddRequirements(new ValidateAccessToken())
+        .Build();
 });
 
 var app = builder.Build();

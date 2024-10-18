@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace SampleDotNet.Migrations
+namespace SampleDotNet.Migrations.ApplicationDB
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class appinit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,11 +15,11 @@ namespace SampleDotNet.Migrations
                 name: "Employees",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Salary = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Phone = table.Column<string>(type: "text", nullable: true),
+                    Salary = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -30,8 +30,8 @@ namespace SampleDotNet.Migrations
                 name: "RefreshTokens",
                 columns: table => new
                 {
-                    Jti = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ExpiresIn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Jti = table.Column<string>(type: "text", nullable: false),
+                    ExpiresIn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -42,9 +42,9 @@ namespace SampleDotNet.Migrations
                 name: "UserAccTokens",
                 columns: table => new
                 {
-                    Token = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsBlackListed = table.Column<bool>(type: "bit", nullable: false)
+                    Token = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: true),
+                    IsBlackListed = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using SampleDotNet.Data;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace SampleDotNet.Services
 {
@@ -16,8 +14,9 @@ namespace SampleDotNet.Services
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ValidateAccessToken requirement)
         {
-            try {
-                var jtiClaim = context.User.Claims.Single(claim => claim.Type == "jti");
+            try
+            {
+                var jtiClaim = context.User.Claims.SingleOrDefault(claim => claim.Type == "jti");
 
                 if (jtiClaim == null)
                 {
@@ -35,7 +34,9 @@ namespace SampleDotNet.Services
                 
                 context.Succeed(requirement);
                 return Task.CompletedTask;
-            } catch{
+            } catch
+            {
+                context.Fail();
                 return Task.CompletedTask;
             }
         }

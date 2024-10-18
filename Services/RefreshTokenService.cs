@@ -46,7 +46,7 @@ namespace SampleDotNet.Services
                 throw new KeyNotFoundException("Given Jti not found");
             }
 
-            int expirationResult = DateTime.Compare(refreshToken.ExpiresIn, DateTime.Now);
+            int expirationResult = DateTimeOffset.Compare(refreshToken.ExpiresIn, DateTimeOffset.Now);
 
             if(expirationResult < 0)
             {

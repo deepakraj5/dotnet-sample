@@ -17,7 +17,13 @@ namespace SampleDotNet.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<RefreshToken>().HasKey(e => e.Jti);
+            modelBuilder.Entity<RefreshToken>(e =>
+            {
+                e.HasKey(e => e.Jti);
+                e.Property(e => e.ExpiresIn).HasConversion(
+                    v => v.UtcDateTime,
+                    v => new DateTimeOffset(v));
+            });
             modelBuilder.Entity<UserAccToken>().HasKey(e => e.Token);
         }
     }
